@@ -6,12 +6,13 @@ from PIL import Image
 from torch.utils.data import Dataset
 
 
-class Image2Mask(Dataset):
+class Image2BinaryMask(Dataset):
 
-    def __init__(self, img_dir, postfix_img, mask_dir, postfix_mask, transform=None):
+    def __init__(self, img_dir, postfix_img, mask_dir, postfix_mask, transform=None, multichannel_label=False):
         self.imgs = np.array(sorted(glob.glob(f"{img_dir}/*.{postfix_img}")))
         self.masks = np.array(sorted(glob.glob(f"{mask_dir}/*.{postfix_mask}")))
         self.transform = transform
+        self.multichannel_label = multichannel_label
 
     def __len__(self):
         return len(self.imgs)
@@ -30,5 +31,11 @@ class Image2Mask(Dataset):
             transformed = self.transform(image=img, mask=mask)
             img = transformed["image"]
             mask = transformed["mask"]
+
+        if self.multichannel_label:
+            tmp = torch.zeros(img.shape)
+            tmp[:, 0, :, :] = 1 - mask
+            tmp[:, 1, :, :] = mask
+            mask = tmp
 
         return {'image': img, "mask": mask}

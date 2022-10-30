@@ -4,11 +4,11 @@ from positional_encodings.torch_encodings import PositionalEncoding2D, Summer
 from torch import nn
 from torchvision.models import resnet50
 
-from blocks.decoder_layer import DecoderLayer
-from blocks.encoder_layer import EncoderLayer
+from models.segmentation2D.detr_unet.blocks.decoder_layer import DecoderLayer
+from models.segmentation2D.detr_unet.blocks.encoder_layer import EncoderLayer
 
 
-class UNetTransformer(nn.Module):
+class DETRUnet(nn.Module):
     """
     Not TransUNet.
     Adds a transformer after bottleneck. No linear projection
@@ -83,7 +83,7 @@ class UNetTransformer(nn.Module):
 
 
 if __name__ == "__main__":
-    net = UNetTransformer()
+    net = DETRUnet()
 
     inp = torch.rand((1, 3, 512, 512))
     print(net(inp).shape)
