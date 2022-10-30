@@ -27,7 +27,8 @@ class UNetTransformer(nn.Module):
                  pool: str = 'max',
                  concat_type: str = 'pad',
                  nhead: int = 8,
-                 num_layers: int = 6):
+                 num_layers: int = 6,
+                 d_model: int = 1024):
         super().__init__()
 
         self.in_channels = in_channels
@@ -35,9 +36,9 @@ class UNetTransformer(nn.Module):
 
         # Define number of output channels per conv
         if not conv_channels:
-            self.conv_channels = [64, 128, 256, 512, 1024]
+            self.conv_channels = [64, 128, 256, 512]
         else:
-            assert (np.array(conv_channels) / conv_channels[0] == [1, 2, 4, 8, 16]).all()
+            assert (np.array(conv_channels) / conv_channels[0] == [1, 2, 4, 8]).all()
             self.conv_channels = conv_channels
 
         assert pool in ['max', 'avg']
@@ -53,18 +54,18 @@ class UNetTransformer(nn.Module):
                                      norm=norm, input_shape=input_shape, pool=pool)
 
         # Bottleneck
-        self.encoder5 = DoubleConv(self.conv_channels[3], self.conv_channels[4], activation=activation,
-                                   norm=norm, input_shape=input_shape)
+        self.bottleneck = DoubleConv(self.conv_channels[3], d_model, activation=activation,
+                                     norm=norm, input_shape=input_shape)
 
         # Positional Encoding
-        self.pos_enc = Summer(PositionalEncoding2D(self.conv_channels[4]))
+        self.pos_enc = Summer(PositionalEncoding2D(d_model))
 
         # Transformer
-        trans_enc_layer = nn.TransformerEncoderLayer(nhead=nhead, d_model=self.conv_channels[4])
+        trans_enc_layer = nn.TransformerEncoderLayer(nhead=nhead, d_model=d_model)
         self.trans_enc = nn.TransformerEncoder(encoder_layer=trans_enc_layer, num_layers=num_layers)
 
         # Decoder
-        self.decoder1 = DecoderLayer(self.conv_channels[4], self.conv_channels[3], concat_type=concat_type,
+        self.decoder1 = DecoderLayer(d_model, self.conv_channels[3], concat_type=concat_type,
                                      activation=activation, norm=norm, input_shape=input_shape)
         self.decoder2 = DecoderLayer(self.conv_channels[3], self.conv_channels[2], concat_type=concat_type,
                                      activation=activation, norm=norm, input_shape=input_shape)
@@ -82,12 +83,12 @@ class UNetTransformer(nn.Module):
         x, skip2 = self.encoder2(x)
         x, skip3 = self.encoder3(x)
         x, skip4 = self.encoder4(x)
-        x = self.encoder5(x)
+        x = self.bottleneck(x)
 
         t_size = x.shape
         x = self.pos_enc(x)
         x = self.trans_enc(x.flatten(2).permute(2, 0, 1))
-        x = x.permute(2, 0, 1).reshape(t_size)
+        x = x.permute(1, 2, 0).reshape(t_size)
 
         x = self.decoder1(x, skip4)
         x = self.decoder2(x, skip3)

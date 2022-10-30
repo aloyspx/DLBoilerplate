@@ -29,16 +29,17 @@ class Image2Class(Dataset):
         if torch.is_tensor(idx):
             idx = idx.tolist()
 
+        img_path = self.imgs[idx]
+        img = np.array(Image.open(img_path))
+
         if "csv" in self.class_file:
-            cls_rows = self.lbls.loc[self.lbls[self.rows[0]] == img_path.split("/")[-1]]
+            cls_rows = self.lbls.loc[self.lbls[self.rows[0]] == img_path.split('/')[-1]]
             if len(cls_rows) != 1:
-                print(f"Zero or multi class result for this file: {}")
+                print(f"Zero or multi class result for this file: {img_path.split('/')[-1]}")
             cls = cls_rows[0][1]
         else:
             raise NotImplementedError
 
-        img_path = self.imgs[idx]
-        img = np.array(Image.open(img_path))
 
         if self.transform:
             transformed = self.transform(image=img)
