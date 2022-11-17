@@ -1,4 +1,4 @@
-Deep Learning Boilerplate Dump
+Deep Learning Boilerplate Archive
 
 Allows me to have some archive for these models so I can reuse them later for other projects.
 
