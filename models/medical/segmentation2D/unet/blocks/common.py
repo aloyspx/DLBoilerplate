@@ -25,7 +25,7 @@ class WSConv2d(nn.Conv2d):
 
 
 class DoubleConv(nn.Module):
-    def __init__(self, c1: int, c2: int, activation='relu', norm='batch', input_shape=None):
+    def __init__(self, c1: int, c2: int, padding: int = 0, activation='relu', norm='batch', input_shape=None):
         """
         Double convolution as described in U-Net paper. Added some bells and whistles options.
         :param c1: channels in
@@ -65,11 +65,11 @@ class DoubleConv(nn.Module):
 
         ## Convolutions
         if "group" in norm:
-            self.conv1 = WSConv2d(c1, c2, kernel_size=(3, 3))
-            self.conv2 = WSConv2d(c2, c2, kernel_size=(3, 3))
+            self.conv1 = WSConv2d(c1, c2, kernel_size=(3, 3), padding=padding)
+            self.conv2 = WSConv2d(c2, c2, kernel_size=(3, 3), padding=padding)
         else:
-            self.conv1 = nn.Conv2d(c1, c2, kernel_size=(3, 3))
-            self.conv2 = nn.Conv2d(c2, c2, kernel_size=(3, 3))
+            self.conv1 = nn.Conv2d(c1, c2, kernel_size=(3, 3), padding=padding)
+            self.conv2 = nn.Conv2d(c2, c2, kernel_size=(3, 3), padding=padding)
 
     def forward(self, x):
         x = self.conv1(x)

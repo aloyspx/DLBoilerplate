@@ -8,7 +8,7 @@ from models.medical.segmentation2D.unet.blocks.common import DoubleConv
 
 
 class DecoderLayer(nn.Module):
-    def __init__(self, c1: int, c2: int, concat_type: str = "pad",
+    def __init__(self, c1: int, c2: int, padding: int, concat_type: str = "pad",
                  activation='relu', norm='batch', input_shape=None):
         """
         Double convolution with pooling layer as described in U-Net paper. Added some bells and whistles options.
@@ -27,7 +27,7 @@ class DecoderLayer(nn.Module):
         self.concat_type = concat_type
 
         ## Convolutions
-        self.conv = DoubleConv(c1, c2, activation, norm, input_shape)
+        self.conv = DoubleConv(c1, c2, padding, activation, norm, input_shape)
 
     def forward(self, x, skip):
         ## Upsampling step

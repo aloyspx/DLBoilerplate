@@ -19,6 +19,7 @@ class UNet(nn.Module):
 
     def __init__(self, in_channels: int = 3,
                  conv_channels: List = None,
+                 padding: int = 0,
                  num_classes: int = 2,
                  activation: str = 'relu',
                  norm: str = 'batch',
@@ -40,30 +41,37 @@ class UNet(nn.Module):
         assert pool in ['max', 'avg']
 
         # Encoder
-        self.encoder1 = EncoderLayer(self.in_channels, self.conv_channels[0], activation=activation,
+        self.encoder1 = EncoderLayer(self.in_channels, self.conv_channels[0], padding=padding, activation=activation,
                                      norm=norm, input_shape=input_shape, pool=pool)
-        self.encoder2 = EncoderLayer(self.conv_channels[0], self.conv_channels[1], activation=activation,
+        self.encoder2 = EncoderLayer(self.conv_channels[0], self.conv_channels[1], padding=padding,
+                                     activation=activation,
                                      norm=norm, input_shape=input_shape, pool=pool)
-        self.encoder3 = EncoderLayer(self.conv_channels[1], self.conv_channels[2], activation=activation,
+        self.encoder3 = EncoderLayer(self.conv_channels[1], self.conv_channels[2], padding=padding,
+                                     activation=activation,
                                      norm=norm, input_shape=input_shape, pool=pool)
-        self.encoder4 = EncoderLayer(self.conv_channels[2], self.conv_channels[3], activation=activation,
+        self.encoder4 = EncoderLayer(self.conv_channels[2], self.conv_channels[3], padding=padding,
+                                     activation=activation,
                                      norm=norm, input_shape=input_shape, pool=pool)
 
         # Bottleneck
-        self.encoder5 = DoubleConv(self.conv_channels[3], self.conv_channels[4], activation=activation,
+        self.encoder5 = DoubleConv(self.conv_channels[3], self.conv_channels[4], padding=padding, activation=activation,
                                    norm=norm, input_shape=input_shape)
 
         # Decoder
-        self.decoder1 = DecoderLayer(self.conv_channels[4], self.conv_channels[3], concat_type=concat_type,
+        self.decoder1 = DecoderLayer(self.conv_channels[4], self.conv_channels[3], padding=padding,
+                                     concat_type=concat_type,
                                      activation=activation, norm=norm, input_shape=input_shape)
-        self.decoder2 = DecoderLayer(self.conv_channels[3], self.conv_channels[2], concat_type=concat_type,
+        self.decoder2 = DecoderLayer(self.conv_channels[3], self.conv_channels[2], padding=padding,
+                                     concat_type=concat_type,
                                      activation=activation, norm=norm, input_shape=input_shape)
-        self.decoder3 = DecoderLayer(self.conv_channels[2], self.conv_channels[1], concat_type=concat_type,
+        self.decoder3 = DecoderLayer(self.conv_channels[2], self.conv_channels[1], padding=padding,
+                                     concat_type=concat_type,
                                      activation=activation, norm=norm, input_shape=input_shape)
-        self.decoder4 = DecoderLayer(self.conv_channels[1], self.conv_channels[0], concat_type=concat_type,
+        self.decoder4 = DecoderLayer(self.conv_channels[1], self.conv_channels[0], padding=padding,
+                                     concat_type=concat_type,
                                      activation=activation, norm=norm, input_shape=input_shape)
 
-        self.final = nn.Conv2d(self.conv_channels[0], num_classes, kernel_size=(1, 1))
+        self.final = nn.Conv2d(self.conv_channels[0], num_classes, kernel_size=(1, 1), padding=0)
 
     def forward(self, x: torch.Tensor):
         size = x.shape
@@ -85,7 +93,7 @@ class UNet(nn.Module):
 
 
 if __name__ == "__main__":
-    net = UNet(concat_type="crop")
+    net = UNet(concat_type="crop", padding=1)
 
-    inp = torch.rand((1, 3, 572, 572))
+    inp = torch.rand((1, 3, 512, 512))
     print(net(inp).shape)
