@@ -4,7 +4,7 @@ import torch
 import torch.nn.functional as F
 from torch import nn
 
-from models.segmentation2D.unet.blocks.common import DoubleConv
+from models.medical.segmentation2D.unet.blocks.common import DoubleConv
 
 
 class DecoderLayer(nn.Module):

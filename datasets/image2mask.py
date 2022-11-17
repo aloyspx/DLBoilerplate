@@ -33,9 +33,9 @@ class Image2BinaryMask(Dataset):
             mask = transformed["mask"]
 
         if self.multichannel_label:
-            tmp = torch.zeros(img.shape)
-            tmp[:, 0, :, :] = 1 - mask
-            tmp[:, 1, :, :] = mask
+            tmp = torch.zeros(2, *img.shape[-2:])
+            tmp[0, :, :] = 1 - mask
+            tmp[1, :, ] = mask
             mask = tmp
 
-        return {'image': img, "mask": mask}
+        return {'input': img, "label": mask.type(torch.long)}

@@ -5,9 +5,9 @@ import torch
 import torch.nn.functional as F
 from torch import nn
 
-from models.segmentation2D.unet.blocks.common import DoubleConv
-from models.segmentation2D.unet.blocks.decoder_layer import DecoderLayer
-from models.segmentation2D.unet.blocks.encoder_layer import EncoderLayer
+from models.medical.segmentation2D.unet.blocks.common import DoubleConv
+from models.medical.segmentation2D.unet.blocks.decoder_layer import DecoderLayer
+from models.medical.segmentation2D.unet.blocks.encoder_layer import EncoderLayer
 
 
 class UNet(nn.Module):

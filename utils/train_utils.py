@@ -5,10 +5,11 @@ import torch
 from sklearn.metrics import accuracy_score, precision_score
 
 
-def train_one_epoch(net, trn_dataloader, criterion, optimizer, scheduler=None, grad_clip=None):
+def train_one_epoch(net, trn_dataloader, criterion, optimizer, scheduler=None, grad_clip=None, verbose=False):
     running_loss = 0.0
     net.train()
     for i, data in enumerate(trn_dataloader):
+
         optimizer.zero_grad()
 
         inputs, labels = data["input"], data["label"]
@@ -20,12 +21,15 @@ def train_one_epoch(net, trn_dataloader, criterion, optimizer, scheduler=None, g
         outputs = net(inputs)
 
         loss = criterion(outputs, labels)
-        loss.backwards()
+        loss.backward()
 
         running_loss += loss.item()
 
+        if verbose:
+            print(f"Loss iteration [{i}/{len(trn_dataloader)}]", loss.item())
+
         if grad_clip:
-            torch.nn.utils.clip_grad_norm(net.parameters(), grad_clip)
+            torch.nn.utils.clip_grad_norm_(net.parameters(), grad_clip)
 
         optimizer.step()
 
@@ -40,10 +44,10 @@ def evaluate(net, val_dataloader, metrics=None):
         metrics = ["accuracy"]
 
     incl_metrics = ["accuracy", "precision", "recall", "dice", "iou"]
+    metric_results = {}
     for metric in metrics:
         assert metric in incl_metrics
-
-    metric_results = {}
+        metric_results[metric] = 0.0
 
     net.eval()
     for i, data in enumerate(val_dataloader):
@@ -67,8 +71,10 @@ def evaluate(net, val_dataloader, metrics=None):
                 metric_results[metric] += precision_score(torch.argmax(outputs, dim=1).flatten(3),
                                                           labels.flatten(3)) / len(val_dataloader)
             if metric == "dice":
-                metric_results[metric] += monai.metrics.compute_meandice(outputs, labels) / len(val_dataloader)
+                metric_results[metric] += monai.metrics.compute_meandice(outputs, labels,
+                                                                         include_background=False) / len(val_dataloader)
             if metric == "iou":
-                metric_results[metric] += monai.metrics.compute_meaniou(outputs, labels) / len(val_dataloader)
+                metric_results[metric] += monai.metrics.compute_meaniou(outputs, labels,
+                                                                        include_background=False) / len(val_dataloader)
 
         return metric_results

@@ -40,7 +40,6 @@ class Image2Class(Dataset):
         else:
             raise NotImplementedError
 
-
         if self.transform:
             transformed = self.transform(image=img)
             img = transformed["image"]
