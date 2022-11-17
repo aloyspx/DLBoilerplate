@@ -3,6 +3,10 @@ from torch import nn
 
 
 class YOLO(nn.Module):
+    """
+    You Only Look Once: Unified, Real-Time Object Detection by Redmon et al.
+    """
+
     def __init__(self):
         super().__init__()
         # block 1

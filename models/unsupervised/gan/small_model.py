@@ -1,6 +1,10 @@
 import torch
 from torch import nn
 
+"""
+I'm not sure who exactly to credit but let's go with the first to propose the concept.
+Generative Adversarial Networks by Goodfellow et al.
+"""
 
 class Generator(nn.Module):
     def __init__(self, latent_dim, out_channel=1, width=28, height=28):
