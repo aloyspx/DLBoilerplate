@@ -6,6 +6,7 @@ Still need to rework this a bit.
 Unsupervised Representation Learning with Deep Convolutional Generative Adversarial Networks by Radford et al.
 """
 
+
 class Generator(nn.Module):
     def __init__(self, latent_dim, out_channel=1, width=64, height=64):
         self.out_channel = out_channel

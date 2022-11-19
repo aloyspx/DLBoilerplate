@@ -4,7 +4,7 @@ from torch.nn import functional as F
 from torch.utils.data import DataLoader
 from torchvision import transforms as T
 
-from models.unsupervised.gan.dataset import CelebA
+from datasets.celeba2ganimage import CelebA2GANImage
 from models.unsupervised.gan.small_model import Generator, Discriminator
 
 device = 'cpu'
@@ -19,12 +19,12 @@ lr = 2e-4
 transform = T.Compose([
     T.Resize((28, 28)),
     T.ToTensor(),
-    T.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
+    T.Normalize((0.5, 0.5, 0.5), (0.25, 0.25, 0.25))
 ])
 
 # mnist_dataset = MNIST(root="data", train=True, transform=transform, download=True)
 
-dataset = CelebA(root_dir="../../../data/celeba/img_align_celeba/", transform=transform)
+dataset = CelebA2GANImage(root_dir="../../../data/celeba/img_align_celeba/", transform=transform)
 dataloader = DataLoader(dataset, batch_size=batch_size)
 
 generator = Generator(latent_dim=latent_dim)

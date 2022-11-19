@@ -25,11 +25,14 @@ class UNet3D(nn.Module):
                  norm: str = 'batch',
                  input_shape: List = None,
                  pool: str = 'max',
-                 pool_stride: int = 2):
+                 pool_stride: int = 2,
+                 sigmoid: bool = True
+                 ):
         super().__init__()
 
         self.in_channels = in_channels
         self.num_classes = num_classes
+        self.sigmoid = sigmoid
 
         # Define number of output channels per conv
         if not conv_channels:
@@ -74,11 +77,15 @@ class UNet3D(nn.Module):
         x = self.decoder3(x, skip1)
 
         x = self.final(x)
-        return torch.sigmoid(x)
+
+        if self.sigmoid:
+            x = torch.sigmoid(x)
+
+        return x
 
 
 if __name__ == "__main__":
     net = UNet3D()
 
-    inp = torch.rand((1, 1, 128, 64, 128))
+    inp = torch.rand((1, 1, 128, 128, 128))
     print(net(inp).shape)

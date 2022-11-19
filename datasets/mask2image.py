@@ -6,7 +6,7 @@ from PIL import Image
 from torch.utils.data import Dataset
 
 
-class Image2Mask(Dataset):
+class Mask2Image(Dataset):
 
     def __init__(self, img_dir, postfix_img, mask_dir, postfix_mask, num_cls, transform=None, target_transform=None):
         self.imgs = np.array(sorted(glob.glob(f"{img_dir}/*.{postfix_img}")))
@@ -38,4 +38,4 @@ class Image2Mask(Dataset):
         img = self.transform(img)
         mask = self.target_transform(mask).type(torch.float)
 
-        return img, mask
+        return mask, img

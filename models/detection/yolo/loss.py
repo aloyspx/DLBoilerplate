@@ -1,7 +1,6 @@
 import torch
-from torch import nn
-
 from models.general.yolo.utils import iou
+from torch import nn
 
 
 # prediction (batch x S x S x 100)

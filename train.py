@@ -3,7 +3,7 @@ import torch
 from albumentations.pytorch import ToTensorV2
 from torch.utils.data import DataLoader
 
-from datasets.image2mask import Image2BinaryMask
+from datasets.image2binarymask import Image2BinaryMask
 ## Train dataset
 from models.medical.segmentation2D.unet.model import UNet
 from utils.train_utils import train_one_epoch, evaluate
